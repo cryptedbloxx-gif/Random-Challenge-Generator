@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Random Challenge Generator</title>
+
+<link rel="icon"
+href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🎲</text></svg>">
+
+<style>
+
+body{
+    font-family: Arial, sans-serif;
+    background: linear-gradient(135deg,#6a11cb,#2575fc);
+    color:white;
+    text-align:center;
+    margin:0;
+    min-height:100vh;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+}
+
+.container{
+    max-width:800px;
+    padding:30px;
+}
+
+h1{
+    font-size:3rem;
+}
+
+#challenge{
+    font-size:1.8rem;
+    min-height:100px;
+    margin:30px 0;
+}
+
+button{
+    padding:15px 35px;
+    font-size:1.3rem;
+    border:none;
+    border-radius:12px;
+    cursor:pointer;
+    font-weight:bold;
+    transition:0.25s ease;
+}
+
+button:hover{
+    transform:scale(1.08);
+}
+
+.easy{
+    color:#7cff7c;
+}
+
+.hard{
+    color:#ff6666;
+}
+
+#difficulty{
+    margin-top:20px;
+    font-size:1.2rem;
+    font-weight:bold;
+}
+
+/* Dice Easter Egg */
+
+#dice{
+    display:inline-block;
+    cursor:pointer;
+    transition:
+        transform 0.5s ease,
+        filter 0.5s ease,
+        opacity 1s ease;
+}
+
+#dice:hover{
+    transform:scale(1.2);
+}
+
+/* Screen Shake */
+
+.shake{
+    animation:shake 0.4s;
+}
+
+@keyframes shake{
+    0%{transform:translate(0);}
+    20%{transform:translate(-10px);}
+    40%{transform:translate(10px);}
+    60%{transform:translate(-10px);}
+    80%{transform:translate(10px);}
+    100%{transform:translate(0);}
+}
+
+</style>
+</head>
+<body>
+
+<div class="container">
+
+<h1>
+    <span id="dice">🎲</span>
+    Random Challenge Generator
+</h1>
+
+<div id="challenge">
+    Click the button to get a challenge!
+</div>
+
+<button onclick="generateChallenge()">
+    Generate Challenge
+</button>
+
+<div id="difficulty"></div>
+
+</div>
+
+<!-- Vine Boom Audio -->
+<audio id="vineBoom">
+    <source src="vineboom.mp3" type="audio/mpeg">
+</audio>
+
+<script>
+
+/* Challenges */
+
+const challenges = [
+
+    {text:"Do 10 jumping jacks.", hard:false},
+    {text:"Dance for 20 seconds.", hard:false},
+    {text:"Act like a chicken for 15 seconds.", hard:false},
+    {text:"Tell a joke.", hard:false},
+    {text:"Sing your favorite song.", hard:false},
+    {text:"Balance on one foot for 30 seconds.", hard:false},
+    {text:"Speak like a robot for 1 minute.", hard:false},
+
+    {text:"Do 50 squats.", hard:true},
+    {text:"Hold a plank for 2 minutes.", hard:true},
+    {text:"Do 100 jumping jacks.", hard:true},
+    {text:"Speak in a fake accent for 5 minutes.", hard:true},
+    {text:"Do your funniest dance in public.", hard:true},
+    {text:"Record yourself singing and listen back.", hard:true}
+
+];
+
+function generateChallenge(){
+
+    const random =
+        challenges[Math.floor(Math.random()*challenges.length)];
+
+    document.getElementById("challenge").innerText =
+        random.text;
+
+    const difficulty =
+        document.getElementById("difficulty");
+
+    if(random.hard){
+
+        difficulty.innerHTML =
+            "💀 HARD CHALLENGE";
+
+        difficulty.className =
+            "hard";
+
+        document.getElementById("vineBoom").play();
+
+        document.body.classList.add("shake");
+
+        setTimeout(()=>{
+            document.body.classList.remove("shake");
+        },400);
+
+    }else{
+
+        difficulty.innerHTML =
+            "✅ EASY CHALLENGE";
+
+        difficulty.className =
+            "easy";
+    }
+}
+
+/* Dice Easter Egg */
+
+const dice = document.getElementById("dice");
+
+let hoverTimer;
+
+const goofyFaces = [
+    "🤪",
+    "🤡",
+    "🗿",
+    "💀",
+    "😳",
+    "🐸",
+    "👁️"
+];
+
+dice.addEventListener("mouseenter",()=>{
+
+    hoverTimer = setTimeout(()=>{
+
+        const randomFace =
+            goofyFaces[Math.floor(Math.random()*goofyFaces.length)];
+
+        dice.style.transition =
+            "all 1.5s ease";
+
+        dice.style.transform =
+            "scale(1.45) rotate(360deg)";
+
+        dice.textContent =
+            randomFace;
+
+    },10000); // 10 seconds
+
+});
+
+dice.addEventListener("mouseleave",()=>{
+
+    clearTimeout(hoverTimer);
+
+    dice.textContent = "🎲";
+
+    dice.style.transform =
+        "scale(1) rotate(0deg)";
+
+});
+
+</script>
+
+</body>
+</html>
