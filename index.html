@@ -21,11 +21,30 @@ body{
     display:flex;
     justify-content:center;
     align-items:center;
+    overflow:hidden;
+}
+
+/* PARTICLES */
+.particle{
+    position:fixed;
+    width:6px;
+    height:6px;
+    background:white;
+    border-radius:50%;
+    opacity:0.4;
+    animation:float linear infinite;
+    pointer-events:none;
+}
+
+@keyframes float{
+    from{transform:translateY(100vh);}
+    to{transform:translateY(-10vh);}
 }
 
 .container{
     max-width:800px;
     padding:30px;
+    z-index:2;
 }
 
 h1{
@@ -52,13 +71,11 @@ button:hover{
     transform:scale(1.08);
 }
 
-.easy{
-    color:#7cff7c;
-}
-
-.hard{
-    color:#ff6666;
-}
+/* RARITY COLORS */
+.common{ color:white; }
+.rare{ color:#4cc9f0; }
+.epic{ color:#b517ff; }
+.legendary{ color:#ffd60a; }
 
 #difficulty{
     margin-top:20px;
@@ -66,23 +83,26 @@ button:hover{
     font-weight:bold;
 }
 
-/* Dice Easter Egg */
+/* OWNER */
+#owner{
+    position:fixed;
+    top:15px;
+    right:20px;
+    font-weight:bold;
+}
 
-#dice{
-    display:inline-block;
+/* MUSIC BUTTON */
+#musicBtn{
+    position:fixed;
+    top:15px;
+    left:20px;
+    padding:8px 12px;
+    border:none;
+    border-radius:8px;
     cursor:pointer;
-    transition:
-        transform 0.5s ease,
-        filter 0.5s ease,
-        opacity 1s ease;
 }
 
-#dice:hover{
-    transform:scale(1.2);
-}
-
-/* Screen Shake */
-
+/* SHAKE */
 .shake{
     animation:shake 0.4s;
 }
@@ -98,11 +118,11 @@ button:hover{
 
 </style>
 </head>
+
 <body>
 
-<div style="position:fixed;top:15px;right:20px;color:white;font-weight:bold;">
-👑 OWNER : TEJPREET
-</div>
+<div id="owner">👑 OWNER : TEJPREET</div>
+<button id="musicBtn" onclick="toggleMusic()">🎵 Music</button>
 
 <div class="container">
 
@@ -111,141 +131,119 @@ button:hover{
     Random Challenge Generator
 </h1>
 
-<div id="challenge">
-    Click the button to get a challenge!
-</div>
+<div id="challenge">Click the button to get a challenge!</div>
 
-<button onclick="generateChallenge()">
-    Generate Challenge
-</button>
+<button onclick="generateChallenge()">Generate Challenge</button>
 
 <div id="difficulty"></div>
 
 </div>
 
-<!-- Vine Boom Audio -->
 <audio id="vineBoom">
     <source src="vineboom.mp3" type="audio/mpeg">
 </audio>
-    <audio id="bgm" loop>
+
+<audio id="bgm" loop>
     <source src="bgm.mp3" type="audio/mpeg">
 </audio>
 
 <script>
 
-/* Challenges */
+/* MUSIC */
+const bgm = document.getElementById("bgm");
+bgm.volume = 0.2;
 
+function toggleMusic(){
+    if(bgm.paused) bgm.play();
+    else bgm.pause();
+}
+
+/* PARTICLES */
+for(let i=0;i<40;i++){
+    let p = document.createElement("div");
+    p.className = "particle";
+    p.style.left = Math.random()*100 + "vw";
+    p.style.animationDuration = (Math.random()*8+5)+"s";
+    document.body.appendChild(p);
+}
+
+/* ACHIEVEMENTS */
+let achievements = {
+    first: false,
+    ten: false,
+    legendary: false
+};
+
+let count = 0;
+
+/* CHALLENGES */
 const challenges = [
+    {text:"Do 10 jumping jacks.", type:"common"},
+    {text:"Dance for 20 seconds.", type:"common"},
+    {text:"Act like a chicken.", type:"common"},
 
-    {text:"Do 10 jumping jacks.", hard:false},
-    {text:"Dance for 20 seconds.", hard:false},
-    {text:"Act like a chicken for 15 seconds.", hard:false},
-    {text:"Tell a joke.", hard:false},
-    {text:"Sing your favorite song.", hard:false},
-    {text:"Balance on one foot for 30 seconds.", hard:false},
-    {text:"Speak like a robot for 1 minute.", hard:false},
+    {text:"Do 50 squats.", type:"rare"},
+    {text:"Hold plank for 2 minutes.", type:"rare"},
 
-    {text:"Do 50 squats.", hard:true},
-    {text:"Hold a plank for 2 minutes.", hard:true},
-    {text:"Do 100 jumping jacks.", hard:true},
-    {text:"Speak in a fake accent for 5 minutes.", hard:true},
-    {text:"Do your funniest dance in public.", hard:true},
-    {text:"Record yourself singing and listen back.", hard:true}
+    {text:"Sing loudly in public.", type:"epic"},
 
+    {text:"Go outside and shout 'I AM LEGEND'.", type:"legendary"}
 ];
 
 function generateChallenge(){
 
-    const random =
-        challenges[Math.floor(Math.random()*challenges.length)];
+    let c = challenges[Math.floor(Math.random()*challenges.length)];
 
-    document.getElementById("challenge").innerText =
-        random.text;
+    document.getElementById("challenge").innerText = c.text;
 
-    const difficulty =
-        document.getElementById("difficulty");
+    let diff = document.getElementById("difficulty");
 
-    if(random.hard){
+    diff.className = c.type;
 
-        difficulty.innerHTML =
-            "💀 HARD CHALLENGE";
+    diff.innerText = c.type.toUpperCase() + " CHALLENGE";
 
-        difficulty.className =
-            "hard";
+    document.body.classList.remove("shake");
 
+    if(c.type === "rare") document.body.style.background = "linear-gradient(135deg,#0033ff,#00c3ff)";
+    else if(c.type === "epic") document.body.style.background = "linear-gradient(135deg,#6a00ff,#ff00d4)";
+    else if(c.type === "legendary") document.body.style.background = "linear-gradient(135deg,#ffb700,#ff2a2a)";
+    else document.body.style.background = "linear-gradient(135deg,#6a11cb,#2575fc)";
+
+    if(c.type !== "common"){
         document.getElementById("vineBoom").play();
-
         document.body.classList.add("shake");
-
-        setTimeout(()=>{
-            document.body.classList.remove("shake");
-        },400);
-
-    }else{
-
-        difficulty.innerHTML =
-            "✅ EASY CHALLENGE";
-
-        difficulty.className =
-            "easy";
     }
+
+    count++;
+
+    if(count===1) achievements.first = true;
+    if(count===10) achievements.ten = true;
+    if(c.type==="legendary") achievements.legendary = true;
 }
 
-/* Dice Easter Egg */
-
+/* DICE */
 const dice = document.getElementById("dice");
-
 let hoverTimer;
-    const bgm = document.getElementById("bgm");
 
-bgm.volume = 0.2;
-
-document.addEventListener("click", () => {
-    if (bgm.paused) {
-        bgm.play();
-    }
-}, { once: true });
-
-const goofyFaces = [
-    "🤪",
-    "🤡",
-    "🗿",
-    "💀",
-    "😳",
-    "🐸",
-    "👁️"
-];
+const faces = ["🤪","💀","🤡","🗿","😳"];
 
 dice.addEventListener("mouseenter",()=>{
-
     hoverTimer = setTimeout(()=>{
-
-        const randomFace =
-            goofyFaces[Math.floor(Math.random()*goofyFaces.length)];
-
-        dice.style.transition =
-            "all 1.5s ease";
-
-        dice.style.transform =
-            "scale(1.45) rotate(360deg)";
-
-        dice.textContent =
-            randomFace;
-
-    },10000); // 10 seconds
-
+        dice.textContent = faces[Math.floor(Math.random()*faces.length)];
+        dice.style.transform = "scale(1.5) rotate(360deg)";
+    },10000);
 });
 
 dice.addEventListener("mouseleave",()=>{
-
     clearTimeout(hoverTimer);
-
     dice.textContent = "🎲";
-
-    dice.style.transform =
-        "scale(1) rotate(0deg)";
-
+    dice.style.transform = "scale(1) rotate(0deg)";
 });
+
+/* CLICK TO START AUDIO (browser fix) */
+document.addEventListener("click",()=>{
+    if(bgm.paused) bgm.play();
+},{once:true});
 
 </script>
 
