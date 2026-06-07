@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -24,7 +25,6 @@ body{
     overflow:hidden;
 }
 
-/* PARTICLES */
 .particle{
     position:fixed;
     width:6px;
@@ -47,9 +47,7 @@ body{
     z-index:2;
 }
 
-h1{
-    font-size:3rem;
-}
+h1{ font-size:3rem; }
 
 #challenge{
     font-size:1.8rem;
@@ -67,11 +65,8 @@ button{
     transition:0.25s ease;
 }
 
-button:hover{
-    transform:scale(1.08);
-}
+button:hover{ transform:scale(1.08); }
 
-/* RARITY COLORS */
 .common{ color:white; }
 .rare{ color:#4cc9f0; }
 .epic{ color:#b517ff; }
@@ -83,7 +78,6 @@ button:hover{
     font-weight:bold;
 }
 
-/* OWNER */
 #owner{
     position:fixed;
     top:15px;
@@ -91,7 +85,6 @@ button:hover{
     font-weight:bold;
 }
 
-/* MUSIC BUTTON */
 #musicBtn{
     position:fixed;
     top:15px;
@@ -99,13 +92,9 @@ button:hover{
     padding:8px 12px;
     border:none;
     border-radius:8px;
-    cursor:pointer;
 }
 
-/* SHAKE */
-.shake{
-    animation:shake 0.4s;
-}
+.shake{ animation:shake 0.4s; }
 
 @keyframes shake{
     0%{transform:translate(0);}
@@ -126,10 +115,7 @@ button:hover{
 
 <div class="container">
 
-<h1>
-    <span id="dice">🎲</span>
-    Random Challenge Generator
-</h1>
+<h1><span id="dice">🎲</span> Random Challenge Generator</h1>
 
 <div id="challenge">Click the button to get a challenge!</div>
 
@@ -167,27 +153,113 @@ for(let i=0;i<40;i++){
     document.body.appendChild(p);
 }
 
-/* ACHIEVEMENTS */
-let achievements = {
-    first: false,
-    ten: false,
-    legendary: false
-};
-
-let count = 0;
-
-/* CHALLENGES */
+/* 100 CHALLENGES (UPDATED SYSTEM) */
 const challenges = [
-    {text:"Do 10 jumping jacks.", type:"common"},
-    {text:"Dance for 20 seconds.", type:"common"},
-    {text:"Act like a chicken.", type:"common"},
 
-    {text:"Do 50 squats.", type:"rare"},
-    {text:"Hold plank for 2 minutes.", type:"rare"},
+/* ---------------- COMMON (55) ---------------- */
+{type:"common", text:"Do 10 jumping jacks"},
+{type:"common", text:"Spin in a circle 10 times"},
+{type:"common", text:"Act like a robot for 10 seconds"},
+{type:"common", text:"Clap your hands 20 times"},
+{type:"common", text:"Jump without stopping for 15 seconds"},
+{type:"common", text:"Make a silly face for 10 seconds"},
+{type:"common", text:"Walk around your room backwards"},
+{type:"common", text:"Say your name in a funny voice"},
+{type:"common", text:"Pretend you're in slow motion"},
+{type:"common", text:"Do 5 pushups"},
+{type:"common", text:"Touch your toes 10 times"},
+{type:"common", text:"Hop on one foot for 15 seconds"},
+{type:"common", text:"Stare at the ceiling for 10 seconds"},
+{type:"common", text:"Act like a cat"},
+{type:"common", text:"Act like a dog"},
+{type:"common", text:"Pretend you're a statue"},
+{type:"common", text:"Wave at an imaginary audience"},
+{type:"common", text:"Sit down and stand up 10 times"},
+{type:"common", text:"Do air punches for 10 seconds"},
+{type:"common", text:"Pretend you're typing on invisible keyboard"},
+{type:"common", text:"Dance for 10 seconds"},
+{type:"common", text:"Shake your head for 10 seconds"},
+{type:"common", text:"Do 10 squats"},
+{type:"common", text:"Pretend you're underwater"},
+{type:"common", text:"Act like a zombie"},
+{type:"common", text:"Whisper everything for 1 minute"},
+{type:"common", text:"Walk in a straight line slowly"},
+{type:"common", text:"Pretend you're a superhero posing"},
+{type:"common", text:"Blink 30 times fast"},
+{type:"common", text:"Hold your breath for 5 seconds"},
+{type:"common", text:"Do 10 arm circles"},
+{type:"common", text:"Pretend you're stuck in slow motion glue"},
+{type:"common", text:"Jump and land silently"},
+{type:"common", text:"Pretend you're a news reporter"},
+{type:"common", text:"Say ABC backwards slowly"},
+{type:"common", text:"Do 5 knee bends"},
+{type:"common", text:"Pretend you're a DJ scratching"},
+{type:"common", text:"Look around dramatically"},
+{type:"common", text:"Pretend you're freezing"},
+{type:"common", text:"Act like a chicken"},
+{type:"common", text:"Pretend you're on stage"},
+{type:"common", text:"Spin your chair (if possible)"},
+{type:"common", text:"Point at random things"},
+{type:"common", text:"Say hello in 3 different accents"},
+{type:"common", text:"Do finger guns 20 times"},
+{type:"common", text:"Pretend you're lagging IRL"},
+{type:"common", text:"Sit like a king"},
+{type:"common", text:"Stand like a soldier"},
+{type:"common", text:"Pretend you're invisible"},
+{type:"common", text:"Act like you're surprised"},
+{type:"common", text:"Do 10 head nods"},
+{type:"common", text:"Pretend you're a meme character"},
 
-    {text:"Sing loudly in public.", type:"epic"},
+/* ---------------- RARE (25) ---------------- */
+{type:"rare", text:"Do 50 squats"},
+{type:"rare", text:"Hold plank for 2 minutes"},
+{type:"rare", text:"Run in place for 1 minute"},
+{type:"rare", text:"Do 20 pushups"},
+{type:"rare", text:"Dance non-stop for 1 minute"},
+{type:"rare", text:"Sing a song out loud"},
+{type:"rare", text:"Do 30 jumping jacks fast"},
+{type:"rare", text:"Walk like a crab for 20 seconds"},
+{type:"rare", text:"Do 20 burpees"},
+{type:"rare", text:"Hold wall sit for 1 minute"},
+{type:"rare", text:"Spin 20 times without falling"},
+{type:"rare", text:"Do 15 burpees fast"},
+{type:"rare", text:"Do plank while counting to 60"},
+{type:"rare", text:"Jump continuously for 1 minute"},
+{type:"rare", text:"Act like you're in a boss fight"},
+{type:"rare", text:"Speak only in questions for 1 minute"},
+{type:"rare", text:"Do shadow boxing for 1 minute"},
+{type:"rare", text:"Run around your room 3 times"},
+{type:"rare", text:"Do 25 sit-ups"},
+{type:"rare", text:"Balance on one leg 1 minute"},
+{type:"rare", text:"Hold your breath 20 seconds"},
+{type:"rare", text:"Do 30 arm circles fast"},
+{type:"rare", text:"Pretend you're being chased"},
+{type:"rare", text:"Do 40 jumping jacks"},
+{type:"rare", text:"Dance like crazy for 1 minute"},
 
-    {text:"Go outside and shout 'I AM LEGEND'.", type:"legendary"}
+/* ---------------- EPIC (15) ---------------- */
+{type:"epic", text:"Sing loudly in public (or imagine it)"},
+{type:"epic", text:"Call out ‘I AM THE BEST’ loudly"},
+{type:"epic", text:"Do a dramatic movie scene in front of mirror"},
+{type:"epic", text:"Talk in third person for 5 minutes"},
+{type:"epic", text:"Do a full victory celebration dance"},
+{type:"epic", text:"Pretend you're a villain monologuing"},
+{type:"epic", text:"Act like you're in a music video"},
+{type:"epic", text:"Shout a random motivational speech"},
+{type:"epic", text:"Pretend you're famous being interviewed"},
+{type:"epic", text:"Do your most cringe dance move"},
+{type:"epic", text:"Act like you're on a stage performance"},
+{type:"epic", text:"Laugh dramatically for 20 seconds"},
+{type:"epic", text:"Pretend you're a WWE wrestler entrance"},
+{type:"epic", text:"Say your life is a movie trailer"},
+{type:"epic", text:"Do slow motion action scene"},
+
+/* ---------------- LEGENDARY (5) ---------------- */
+{type:"legendary", text:"Go outside and shout 'I AM LEGEND'"},
+{type:"legendary", text:"Do your craziest dance in public"},
+{type:"legendary", text:"Pretend you're a god announcing arrival"},
+{type:"legendary", text:"Do a full cinematic villain speech loudly"},
+{type:"legendary", text:"Make everyone around you confused on purpose"}
 ];
 
 function generateChallenge(){
@@ -197,9 +269,7 @@ function generateChallenge(){
     document.getElementById("challenge").innerText = c.text;
 
     let diff = document.getElementById("difficulty");
-
     diff.className = c.type;
-
     diff.innerText = c.type.toUpperCase() + " CHALLENGE";
 
     document.body.classList.remove("shake");
@@ -213,34 +283,24 @@ function generateChallenge(){
         document.getElementById("vineBoom").play();
         document.body.classList.add("shake");
     }
-
-    count++;
-
-    if(count===1) achievements.first = true;
-    if(count===10) achievements.ten = true;
-    if(c.type==="legendary") achievements.legendary = true;
 }
 
 /* DICE */
 const dice = document.getElementById("dice");
-let hoverTimer;
 
 const faces = ["🤪","💀","🤡","🗿","😳"];
 
 dice.addEventListener("mouseenter",()=>{
-    hoverTimer = setTimeout(()=>{
-        dice.textContent = faces[Math.floor(Math.random()*faces.length)];
-        dice.style.transform = "scale(1.5) rotate(360deg)";
-    },10000);
+    dice.textContent = faces[Math.floor(Math.random()*faces.length)];
+    dice.style.transform = "scale(1.5) rotate(360deg)";
 });
 
 dice.addEventListener("mouseleave",()=>{
-    clearTimeout(hoverTimer);
     dice.textContent = "🎲";
     dice.style.transform = "scale(1) rotate(0deg)";
 });
 
-/* CLICK TO START AUDIO (browser fix) */
+/* AUTO PLAY FIX */
 document.addEventListener("click",()=>{
     if(bgm.paused) bgm.play();
 },{once:true});
