@@ -3,18 +3,21 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Random Challenge Generator</title>
 
-<title>Lootbox Challenge Game</title>
+<link rel="icon"
+href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🎲</text></svg>">
 
 <style>
 
-/* BACKGROUND */
+/* BASE */
 body{
     margin:0;
     font-family:Arial;
+    color:white;
     overflow:hidden;
     background:linear-gradient(135deg,#6a11cb,#2575fc);
-    color:white;
+    transition:1s ease;
 }
 
 /* PARTICLES */
@@ -26,7 +29,7 @@ body{
     border-radius:50%;
     opacity:0.4;
     animation:float linear infinite;
-    z-index:0;
+    pointer-events:none;
 }
 
 @keyframes float{
@@ -34,73 +37,64 @@ body{
     to{transform:translateY(-10vh);}
 }
 
+/* LAYOUT */
+.container{
+    text-align:center;
+    margin-top:15vh;
+}
+
+h1{font-size:3rem;}
+
+button{
+    padding:15px 30px;
+    font-size:1.2rem;
+    border:none;
+    border-radius:10px;
+    cursor:pointer;
+    transition:0.3s;
+}
+
+button:hover{transform:scale(1.1);}
+
+/* RARITY */
+.common{color:white;}
+.rare{color:#4cc9f0;}
+.epic{color:#b517ff;}
+.legendary{color:#ffd60a;}
+
 /* OWNER */
 #owner{
     position:fixed;
     top:10px;
     right:15px;
     font-weight:bold;
-    z-index:5;
 }
 
-/* MUSIC BUTTON */
-#musicBtn{
+/* MUSIC */
+#music{
     position:fixed;
     top:10px;
     left:15px;
-    padding:10px;
-    border:none;
+    padding:8px;
+}
+
+/* ACHIEVEMENT POPUP */
+#popup{
+    position:fixed;
+    top:-100px;
+    left:50%;
+    transform:translateX(-50%);
+    background:rgba(0,0,0,0.85);
+    padding:12px 20px;
     border-radius:10px;
-    cursor:pointer;
-    transition:0.3s;
-    z-index:5;
+    display:flex;
+    gap:10px;
+    transition:0.5s;
 }
-#musicBtn:hover{
-    transform:scale(1.3);
-}
-
-/* LOOTBOX (FIXED POSITION) */
-#lootbox{
-    position:fixed;
-    bottom:25px;
-    left:50%;
-    transform:translateX(-50%);
-    font-size:80px;
-    cursor:pointer;
-    transition:0.2s;
-    z-index:5;
-}
-
-#lootbox:hover{
-    transform:translateX(-50%) scale(1.15);
-}
-
-/* BREAK ANIMATION */
-.break{
-    animation:break 0.6s forwards;
-}
-
-@keyframes break{
-    0%{transform:translateX(-50%) rotate(0deg) scale(1);}
-    40%{transform:translateX(-50%) rotate(20deg) scale(1.3);}
-    100%{transform:translateX(-50%) rotate(-80deg) scale(0);}
-}
-
-/* CHALLENGE DISPLAY (VISIBLE FIX) */
-#challenge{
-    position:fixed;
-    bottom:120px;
-    left:50%;
-    transform:translateX(-50%);
-    font-size:26px;
-    text-align:center;
-    width:80%;
-    z-index:5;
-}
+#popup.show{top:20px;}
 
 /* SHAKE */
 .shake{animation:shake 0.4s;}
-
 @keyframes shake{
     0%{transform:translate(0);}
     20%{transform:translate(-10px);}
@@ -116,23 +110,30 @@ body{
 <body>
 
 <div id="owner">👑 OWNER : TEJPREET</div>
+<button id="music" onclick="toggleMusic()">🎵</button>
 
-<button id="musicBtn" onclick="toggleMusic()">🎵 Music</button>
+<div class="container">
 
-<div id="challenge">Click lootbox to start</div>
+<h1><span id="dice">🎲</span> Challenge Generator</h1>
 
-<div id="lootbox">🎰</div>
+<div id="challenge">Click to start</div>
+<button onclick="generate()">Generate</button>
+<div id="diff"></div>
 
-<audio id="bgm" loop>
-<source src="bgm.mp3">
-</audio>
+</div>
+
+<!-- POPUP -->
+<div id="popup">
+    <div id="icon">🏆</div>
+    <div id="text">Achievement</div>
+</div>
 
 <audio id="vine">
-<source src="vineboom.mp3">
+    <source src="vineboom.mp3">
 </audio>
 
-<audio id="thrash">
-<source src="Thrash.mp3">
+<audio id="bgm" loop>
+    <source src="bgm.mp3">
 </audio>
 
 <script>
@@ -140,80 +141,100 @@ body{
 /* MUSIC */
 const bgm=document.getElementById("bgm");
 function toggleMusic(){
-bgm.paused ? bgm.play() : bgm.pause();
+    bgm.paused ? bgm.play() : bgm.pause();
 }
 
 /* PARTICLES */
 for(let i=0;i<50;i++){
-let p=document.createElement("div");
-p.className="particle";
-p.style.left=Math.random()*100+"vw";
-p.style.animationDuration=(Math.random()*8+5)+"s";
-document.body.appendChild(p);
+    let p=document.createElement("div");
+    p.className="particle";
+    p.style.left=Math.random()*100+"vw";
+    p.style.animationDuration=(Math.random()*10+5)+"s";
+    document.body.appendChild(p);
 }
 
-/* 100 CHALLENGES */
+/* ACHIEVEMENTS */
+function popup(t,i){
+    let p=document.getElementById("popup");
+    document.getElementById("text").innerText=t;
+    document.getElementById("icon").innerText=i;
+    p.classList.add("show");
+    setTimeout(()=>p.classList.remove("show"),2000);
+}
+
+/* DATA */
+let count=0;
+
 const challenges=[
-"Do 10 pushups","Do 20 squats","Run in place","Dance randomly","Act like chicken",
-"Sing loudly","Spin 10 times","Jump 20 times","Plank 30s","Burpees 5x",
-"Walk backwards","Robot voice","Clap 50 times","Freeze 30s","Sit stand 20x",
-"Touch toes","Balance one foot","Lunges 10x","Funny face","Alphabet backwards",
-"Shadow boxing","Jumping jacks","Monkey act","Zombie walk","Air guitar",
-"Cartwheel try","Slow dance","Act scared","Silent scream","Fast spin"
+{t:"Do 10 pushups",r:"common"},
+{t:"Dance for 20 sec",r:"common"},
+{t:"Act like chicken",r:"common"},
+
+{t:"Do 50 squats",r:"rare"},
+{t:"Hold plank 2 min",r:"rare"},
+
+{t:"Sing in public",r:"epic"},
+
+{t:"Scream I AM LEGEND",r:"legendary"}
 ];
 
-/* LOOTBOX SYSTEM */
-const box=document.getElementById("lootbox");
-const text=document.getElementById("challenge");
+/* GAME */
+function generate(){
 
-let clickCount=0;
-
-box.addEventListener("click",()=>{
-
-clickCount++;
-
-/* NORMAL CLICK FEEDBACK */
-if(clickCount<3){
-box.style.transform="translateX(-50%) scale(1.2)";
-setTimeout(()=>{
-box.style.transform="translateX(-50%) scale(1)";
-},150);
-return;
-}
-
-/* 3 CLICK TRIGGER */
-clickCount=0;
-
-document.getElementById("thrash").play();
-
-/* BREAK ANIMATION */
-box.classList.add("break");
-
-setTimeout(()=>{
-
-box.classList.remove("break");
-
-/* FINAL REWARD */
 let c=challenges[Math.floor(Math.random()*challenges.length)];
 
-text.innerText=c;
+document.getElementById("challenge").innerText=c.t;
+document.getElementById("diff").innerText=c.r.toUpperCase();
+document.getElementById("diff").className=c.r;
 
-/* EFFECT */
+/* BACKGROUND */
+if(c.r==="rare"){
+document.body.style.background="linear-gradient(135deg,#0033ff,#00c3ff)";
+}
+else if(c.r==="epic"){
+document.body.style.background="linear-gradient(135deg,#6a00ff,#ff00d4)";
+}
+else if(c.r==="legendary"){
+document.body.style.background="linear-gradient(135deg,#ffb700,#ff2a2a)";
+}
+else{
+document.body.style.background="linear-gradient(135deg,#6a11cb,#2575fc)";
+}
+
+/* EFFECTS */
+if(c.r!=="common"){
 document.getElementById("vine").play();
 document.body.classList.add("shake");
+setTimeout(()=>document.body.classList.remove("shake"),400);
+}
 
-setTimeout(()=>{
-document.body.classList.remove("shake");
-},400);
+/* ACHIEVEMENTS */
+count++;
+if(count===1)popup("First Challenge!","🎲");
+if(count===10)popup("10 Challenges!","🔥");
+if(c.r==="legendary")popup("LEGENDARY FOUND!","👑");
 
-},600);
+}
 
+/* DICE EASTER EGG */
+const dice=document.getElementById("dice");
+let timer;
+
+dice.addEventListener("mouseenter",()=>{
+timer=setTimeout(()=>{
+dice.innerText=["🤡","💀","🗿","😳"][Math.floor(Math.random()*4)];
+dice.style.transform="scale(1.5) rotate(360deg)";
+},10000);
 });
 
-/* START MUSIC ON CLICK */
-document.addEventListener("click",()=>{
-bgm.play();
-},{once:true});
+dice.addEventListener("mouseleave",()=>{
+clearTimeout(timer);
+dice.innerText="🎲";
+dice.style.transform="scale(1)";
+});
+
+/* MUSIC START */
+document.addEventListener("click",()=>bgm.play(),{once:true});
 
 </script>
 
