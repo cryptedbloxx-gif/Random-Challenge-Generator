@@ -233,19 +233,53 @@ document.getElementById("combo").innerText="🔥 Combo: "+combo;
 function openLootbox(){
 
 let spin=0;
+let speed=60;
+
+let lootbox=document.getElementById("lootbox");
+lootbox.style.transform="scale(1.2)";
+lootbox.style.boxShadow="0 0 20px white";
+
 let interval=setInterval(()=>{
 
-document.getElementById("challenge").innerText=
+document.getElementById("challenge").innerText =
 challenges[Math.floor(Math.random()*challenges.length)].t;
 
+/* slow down effect */
 spin++;
 
-if(spin>10){
+if(spin>5) speed=90;
+if(spin>10) speed=140;
+if(spin>15) speed=200;
+
 clearInterval(interval);
-generate();
+interval=setInterval(arguments.callee, speed);
+
+if(spin>20){
+
+clearInterval(interval);
+
+/* FINAL REVEAL */
+let final = challenges[Math.floor(Math.random()*challenges.length)];
+
+document.getElementById("challenge").innerText = final.t;
+
+/* pop animation */
+lootbox.style.transform="scale(1)";
+lootbox.style.boxShadow="0 0 0px transparent";
+
+document.getElementById("difficulty").innerText=final.r.toUpperCase();
+document.getElementById("difficulty").className=final.r;
+
+if(final.r!=="common"){
+document.getElementById("vine").play();
+document.body.classList.add("shake");
+setTimeout(()=>document.body.classList.remove("shake"),400);
 }
 
-},100);
+}
+
+},60);
+
 }
 
 </script>
