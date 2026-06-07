@@ -3,6 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
 <title>Lootbox Challenge Game</title>
 
 <style>
@@ -25,6 +26,7 @@ body{
     border-radius:50%;
     opacity:0.4;
     animation:float linear infinite;
+    z-index:0;
 }
 
 @keyframes float{
@@ -38,6 +40,7 @@ body{
     top:10px;
     right:15px;
     font-weight:bold;
+    z-index:5;
 }
 
 /* MUSIC BUTTON */
@@ -50,50 +53,54 @@ body{
     border-radius:10px;
     cursor:pointer;
     transition:0.3s;
+    z-index:5;
 }
 #musicBtn:hover{
     transform:scale(1.3);
 }
 
-/* LOOTBOX */
+/* LOOTBOX (FIXED POSITION) */
 #lootbox{
-    position:absolute;
-    top:50%;
+    position:fixed;
+    bottom:25px;
     left:50%;
-    transform:translate(-50%,-50%);
-    font-size:120px;
+    transform:translateX(-50%);
+    font-size:80px;
     cursor:pointer;
     transition:0.2s;
+    z-index:5;
 }
+
 #lootbox:hover{
-    transform:translate(-50%,-50%) scale(1.1);
+    transform:translateX(-50%) scale(1.15);
 }
 
 /* BREAK ANIMATION */
 .break{
     animation:break 0.6s forwards;
 }
+
 @keyframes break{
-    0%{transform:translate(-50%,-50%) scale(1);}
-    50%{transform:translate(-50%,-50%) rotate(20deg) scale(1.3);}
-    100%{transform:translate(-50%,-50%) rotate(-60deg) scale(0);}
+    0%{transform:translateX(-50%) rotate(0deg) scale(1);}
+    40%{transform:translateX(-50%) rotate(20deg) scale(1.3);}
+    100%{transform:translateX(-50%) rotate(-80deg) scale(0);}
 }
 
-/* CHALLENGE POPUP */
+/* CHALLENGE DISPLAY (VISIBLE FIX) */
 #challenge{
     position:fixed;
-    bottom:60px;
+    bottom:120px;
     left:50%;
     transform:translateX(-50%);
-    font-size:25px;
-    opacity:0;
-    transition:0.5s;
+    font-size:26px;
+    text-align:center;
+    width:80%;
+    z-index:5;
 }
 
 /* SHAKE */
-.shake{
-    animation:shake 0.4s;
-}
+.shake{animation:shake 0.4s;}
+
 @keyframes shake{
     0%{transform:translate(0);}
     20%{transform:translate(-10px);}
@@ -110,11 +117,11 @@ body{
 
 <div id="owner">👑 OWNER : TEJPREET</div>
 
-<button id="musicBtn" onclick="toggleMusic()">🔊</button>
+<button id="musicBtn" onclick="toggleMusic()">🎵 Music</button>
+
+<div id="challenge">Click lootbox to start</div>
 
 <div id="lootbox">🎰</div>
-
-<div id="challenge"></div>
 
 <audio id="bgm" loop>
 <source src="bgm.mp3">
@@ -132,11 +139,8 @@ body{
 
 /* MUSIC */
 const bgm=document.getElementById("bgm");
-let musicOn=true;
-
 function toggleMusic(){
-if(musicOn){bgm.pause();musicOn=false;}
-else{bgm.play();musicOn=true;}
+bgm.paused ? bgm.play() : bgm.pause();
 }
 
 /* PARTICLES */
@@ -150,67 +154,59 @@ document.body.appendChild(p);
 
 /* 100 CHALLENGES */
 const challenges=[
-"Do 10 pushups","Do 20 squats","Run in place 1 min","Dance randomly","Act like a chicken",
-"Sing loudly","Spin 10 times","Jump 15 times","Do plank 30s","Do 5 burpees",
-"Walk backwards","Talk in robot voice","Clap 50 times","Stare challenge 1 min","Sit and stand 20x",
-"Touch your toes","Balance on one foot","Do 10 lunges","Make a funny face","Say alphabet backwards",
-"Run around room","Do shadow boxing","Do 15 situps","Hop on one leg","Pretend you're a zombie",
-"Do air guitar","Do 30 jumping jacks","Act like monkey","Whisper for 1 min","Freeze for 30s",
-"Do 5 cartwheels","Dance without music","Act scared","Sing opera style","Do slow motion walk",
-"Make meme face","Do 10 squats slow","Act like robot","Spin chair 5 times","Do wall sit 30s",
-"Run outside","Clap above head","Do 10 pushups slow","Act like alien","Talk without lips",
-"Do crab walk","Jump like frog","Act like superhero","Do 25 squats","Do 1 min plank",
-"Do 10 burpees","Act like boss","Walk like ninja","Do silly dance","Make rap beat",
-"Say tongue twister","Do shadow dance","Balance book head","Do pushups fast","Act like clown",
-"Run zigzag","Do squat jumps","Act like ghost","Do air boxing","Do 50 jumps",
-"Spin 20 times","Act like teacher","Do 10 frog jumps","Do situps fast","Act like king",
-"Do plank walk","Do 30 squats","Act like robot broken","Jump backwards","Do funny scream",
-"Act like DJ","Do fast dance","Do slow squat","Do 10 pushups clap","Act like villain",
-"Do star jumps","Run in circle","Do wall pushups","Act like dragon","Do 100 jumps",
-"Hold breath 10s","Do silent dance","Act like statue","Do ninja roll","Do 20 burpees",
-"Do handstand try","Act like superhero landing","Do power pose","Do silly walk","Freeze dance"
+"Do 10 pushups","Do 20 squats","Run in place","Dance randomly","Act like chicken",
+"Sing loudly","Spin 10 times","Jump 20 times","Plank 30s","Burpees 5x",
+"Walk backwards","Robot voice","Clap 50 times","Freeze 30s","Sit stand 20x",
+"Touch toes","Balance one foot","Lunges 10x","Funny face","Alphabet backwards",
+"Shadow boxing","Jumping jacks","Monkey act","Zombie walk","Air guitar",
+"Cartwheel try","Slow dance","Act scared","Silent scream","Fast spin"
 ];
 
-let clickCount=0;
-
-/* LOOTBOX */
+/* LOOTBOX SYSTEM */
 const box=document.getElementById("lootbox");
 const text=document.getElementById("challenge");
+
+let clickCount=0;
 
 box.addEventListener("click",()=>{
 
 clickCount++;
 
-/* TRIPLE CLICK EVENT */
-if(clickCount===3){
+/* NORMAL CLICK FEEDBACK */
+if(clickCount<3){
+box.style.transform="translateX(-50%) scale(1.2)";
+setTimeout(()=>{
+box.style.transform="translateX(-50%) scale(1)";
+},150);
+return;
+}
+
+/* 3 CLICK TRIGGER */
 clickCount=0;
 
 document.getElementById("thrash").play();
-box.classList.add("shake","break");
+
+/* BREAK ANIMATION */
+box.classList.add("break");
 
 setTimeout(()=>{
+
 box.classList.remove("break");
 
+/* FINAL REWARD */
 let c=challenges[Math.floor(Math.random()*challenges.length)];
 
 text.innerText=c;
-text.style.opacity=1;
-text.style.transform="scale(1.2)";
+
+/* EFFECT */
+document.getElementById("vine").play();
+document.body.classList.add("shake");
 
 setTimeout(()=>{
-text.style.transform="scale(1)";
-},500);
+document.body.classList.remove("shake");
+},400);
 
 },600);
-
-}else{
-
-box.style.transform="translate(-50%,-50%) scale(1.2)";
-setTimeout(()=>{
-box.style.transform="translate(-50%,-50%) scale(1)";
-},200);
-
-}
 
 });
 
