@@ -3,6 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
 <title>Random Challenge Generator</title>
 
 <link rel="icon"
@@ -10,14 +11,17 @@ href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%22
 
 <style>
 
-/* BASE */
 body{
-    margin:0;
-    font-family:Arial;
+    font-family: Arial, sans-serif;
+    background: linear-gradient(135deg,#6a11cb,#2575fc);
     color:white;
+    text-align:center;
+    margin:0;
+    min-height:100vh;
+    display:flex;
+    justify-content:center;
+    align-items:center;
     overflow:hidden;
-    background:linear-gradient(135deg,#6a11cb,#2575fc);
-    transition:1s ease;
 }
 
 /* PARTICLES */
@@ -37,64 +41,72 @@ body{
     to{transform:translateY(-10vh);}
 }
 
-/* LAYOUT */
 .container{
-    text-align:center;
-    margin-top:15vh;
+    max-width:800px;
+    padding:30px;
+    z-index:2;
 }
 
-h1{font-size:3rem;}
+h1{
+    font-size:3rem;
+}
+
+#challenge{
+    font-size:1.8rem;
+    min-height:100px;
+    margin:30px 0;
+}
 
 button{
-    padding:15px 30px;
-    font-size:1.2rem;
+    padding:15px 35px;
+    font-size:1.3rem;
     border:none;
-    border-radius:10px;
+    border-radius:12px;
     cursor:pointer;
-    transition:0.3s;
+    font-weight:bold;
+    transition:0.25s ease;
 }
 
-button:hover{transform:scale(1.1);}
+button:hover{
+    transform:scale(1.08);
+}
 
-/* RARITY */
-.common{color:white;}
-.rare{color:#4cc9f0;}
-.epic{color:#b517ff;}
-.legendary{color:#ffd60a;}
+/* RARITY COLORS */
+.common{ color:white; }
+.rare{ color:#4cc9f0; }
+.epic{ color:#b517ff; }
+.legendary{ color:#ffd60a; }
+
+#difficulty{
+    margin-top:20px;
+    font-size:1.2rem;
+    font-weight:bold;
+}
 
 /* OWNER */
 #owner{
     position:fixed;
-    top:10px;
-    right:15px;
+    top:15px;
+    right:20px;
     font-weight:bold;
 }
 
-/* MUSIC */
-#music{
+/* MUSIC BUTTON */
+#musicBtn{
     position:fixed;
-    top:10px;
-    left:15px;
-    padding:8px;
+    top:15px;
+    left:20px;
+    padding:8px 12px;
+    border:none;
+    border-radius:8px;
+    cursor:pointer;
 }
-
-/* ACHIEVEMENT POPUP */
-#popup{
-    position:fixed;
-    top:-100px;
-    left:50%;
-    transform:translateX(-50%);
-    background:rgba(0,0,0,0.85);
-    padding:12px 20px;
-    border-radius:10px;
-    display:flex;
-    gap:10px;
-    transition:0.5s;
-}
-#popup.show{top:20px;}
 
 /* SHAKE */
-.shake{animation:shake 0.4s;}
+.shake{
+    animation:shake 0.4s;
+}
+
 @keyframes shake{
     0%{transform:translate(0);}
     20%{transform:translate(-10px);}
@@ -110,131 +122,128 @@ button:hover{transform:scale(1.1);}
 <body>
 
 <div id="owner">👑 OWNER : TEJPREET</div>
-<button id="music" onclick="toggleMusic()">🎵</button>
+<button id="musicBtn" onclick="toggleMusic()">🎵 Music</button>
 
 <div class="container">
 
-<h1><span id="dice">🎲</span> Challenge Generator</h1>
+<h1>
+    <span id="dice">🎲</span>
+    Random Challenge Generator
+</h1>
 
-<div id="challenge">Click to start</div>
-<button onclick="generate()">Generate</button>
-<div id="diff"></div>
+<div id="challenge">Click the button to get a challenge!</div>
+
+<button onclick="generateChallenge()">Generate Challenge</button>
+
+<div id="difficulty"></div>
 
 </div>
 
-<!-- POPUP -->
-<div id="popup">
-    <div id="icon">🏆</div>
-    <div id="text">Achievement</div>
-</div>
-
-<audio id="vine">
-    <source src="vineboom.mp3">
+<audio id="vineBoom">
+    <source src="vineboom.mp3" type="audio/mpeg">
 </audio>
 
 <audio id="bgm" loop>
-    <source src="bgm.mp3">
+    <source src="bgm.mp3" type="audio/mpeg">
 </audio>
 
 <script>
 
 /* MUSIC */
-const bgm=document.getElementById("bgm");
+const bgm = document.getElementById("bgm");
+bgm.volume = 0.2;
+
 function toggleMusic(){
-    bgm.paused ? bgm.play() : bgm.pause();
+    if(bgm.paused) bgm.play();
+    else bgm.pause();
 }
 
 /* PARTICLES */
-for(let i=0;i<50;i++){
-    let p=document.createElement("div");
-    p.className="particle";
-    p.style.left=Math.random()*100+"vw";
-    p.style.animationDuration=(Math.random()*10+5)+"s";
+for(let i=0;i<40;i++){
+    let p = document.createElement("div");
+    p.className = "particle";
+    p.style.left = Math.random()*100 + "vw";
+    p.style.animationDuration = (Math.random()*8+5)+"s";
     document.body.appendChild(p);
 }
 
 /* ACHIEVEMENTS */
-function popup(t,i){
-    let p=document.getElementById("popup");
-    document.getElementById("text").innerText=t;
-    document.getElementById("icon").innerText=i;
-    p.classList.add("show");
-    setTimeout(()=>p.classList.remove("show"),2000);
-}
+let achievements = {
+    first: false,
+    ten: false,
+    legendary: false
+};
 
-/* DATA */
-let count=0;
+let count = 0;
 
-const challenges=[
-{t:"Do 10 pushups",r:"common"},
-{t:"Dance for 20 sec",r:"common"},
-{t:"Act like chicken",r:"common"},
+/* CHALLENGES */
+const challenges = [
+    {text:"Do 10 jumping jacks.", type:"common"},
+    {text:"Dance for 20 seconds.", type:"common"},
+    {text:"Act like a chicken.", type:"common"},
 
-{t:"Do 50 squats",r:"rare"},
-{t:"Hold plank 2 min",r:"rare"},
+    {text:"Do 50 squats.", type:"rare"},
+    {text:"Hold plank for 2 minutes.", type:"rare"},
 
-{t:"Sing in public",r:"epic"},
+    {text:"Sing loudly in public.", type:"epic"},
 
-{t:"Scream I AM LEGEND",r:"legendary"}
+    {text:"Go outside and shout 'I AM LEGEND'.", type:"legendary"}
 ];
 
-/* GAME */
-function generate(){
+function generateChallenge(){
 
-let c=challenges[Math.floor(Math.random()*challenges.length)];
+    let c = challenges[Math.floor(Math.random()*challenges.length)];
 
-document.getElementById("challenge").innerText=c.t;
-document.getElementById("diff").innerText=c.r.toUpperCase();
-document.getElementById("diff").className=c.r;
+    document.getElementById("challenge").innerText = c.text;
 
-/* BACKGROUND */
-if(c.r==="rare"){
-document.body.style.background="linear-gradient(135deg,#0033ff,#00c3ff)";
-}
-else if(c.r==="epic"){
-document.body.style.background="linear-gradient(135deg,#6a00ff,#ff00d4)";
-}
-else if(c.r==="legendary"){
-document.body.style.background="linear-gradient(135deg,#ffb700,#ff2a2a)";
-}
-else{
-document.body.style.background="linear-gradient(135deg,#6a11cb,#2575fc)";
-}
+    let diff = document.getElementById("difficulty");
 
-/* EFFECTS */
-if(c.r!=="common"){
-document.getElementById("vine").play();
-document.body.classList.add("shake");
-setTimeout(()=>document.body.classList.remove("shake"),400);
-}
+    diff.className = c.type;
 
-/* ACHIEVEMENTS */
-count++;
-if(count===1)popup("First Challenge!","🎲");
-if(count===10)popup("10 Challenges!","🔥");
-if(c.r==="legendary")popup("LEGENDARY FOUND!","👑");
+    diff.innerText = c.type.toUpperCase() + " CHALLENGE";
 
+    document.body.classList.remove("shake");
+
+    if(c.type === "rare") document.body.style.background = "linear-gradient(135deg,#0033ff,#00c3ff)";
+    else if(c.type === "epic") document.body.style.background = "linear-gradient(135deg,#6a00ff,#ff00d4)";
+    else if(c.type === "legendary") document.body.style.background = "linear-gradient(135deg,#ffb700,#ff2a2a)";
+    else document.body.style.background = "linear-gradient(135deg,#6a11cb,#2575fc)";
+
+    if(c.type !== "common"){
+        document.getElementById("vineBoom").play();
+        document.body.classList.add("shake");
+    }
+
+    count++;
+
+    if(count===1) achievements.first = true;
+    if(count===10) achievements.ten = true;
+    if(c.type==="legendary") achievements.legendary = true;
 }
 
-/* DICE EASTER EGG */
-const dice=document.getElementById("dice");
-let timer;
+/* DICE */
+const dice = document.getElementById("dice");
+let hoverTimer;
+
+const faces = ["🤪","💀","🤡","🗿","😳"];
 
 dice.addEventListener("mouseenter",()=>{
-timer=setTimeout(()=>{
-dice.innerText=["🤡","💀","🗿","😳"][Math.floor(Math.random()*4)];
-dice.style.transform="scale(1.5) rotate(360deg)";
-},10000);
+    hoverTimer = setTimeout(()=>{
+        dice.textContent = faces[Math.floor(Math.random()*faces.length)];
+        dice.style.transform = "scale(1.5) rotate(360deg)";
+    },10000);
 });
 
 dice.addEventListener("mouseleave",()=>{
-clearTimeout(timer);
-dice.innerText="🎲";
-dice.style.transform="scale(1)";
+    clearTimeout(hoverTimer);
+    dice.textContent = "🎲";
+    dice.style.transform = "scale(1) rotate(0deg)";
 });
 
-/* MUSIC START */
-document.addEventListener("click",()=>bgm.play(),{once:true});
+/* CLICK TO START AUDIO (browser fix) */
+document.addEventListener("click",()=>{
+    if(bgm.paused) bgm.play();
+},{once:true});
 
 </script>
 
