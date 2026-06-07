@@ -3,25 +3,17 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-<title>Random Challenge Generator</title>
-
-<link rel="icon"
-href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🎲</text></svg>">
+<title>Lootbox Challenge Game</title>
 
 <style>
 
+/* BACKGROUND */
 body{
-    font-family: Arial, sans-serif;
-    background: linear-gradient(135deg,#6a11cb,#2575fc);
-    color:white;
-    text-align:center;
     margin:0;
-    min-height:100vh;
-    display:flex;
-    justify-content:center;
-    align-items:center;
+    font-family:Arial;
     overflow:hidden;
+    background:linear-gradient(135deg,#6a11cb,#2575fc);
+    color:white;
 }
 
 /* PARTICLES */
@@ -33,17 +25,11 @@ body{
     border-radius:50%;
     opacity:0.4;
     animation:float linear infinite;
-    pointer-events:none;
 }
 
 @keyframes float{
     from{transform:translateY(100vh);}
     to{transform:translateY(-10vh);}
-}
-
-.container{
-    max-width:800px;
-    padding:30px;
 }
 
 /* OWNER */
@@ -54,53 +40,60 @@ body{
     font-weight:bold;
 }
 
-/* MUSIC */
+/* MUSIC BUTTON */
 #musicBtn{
     position:fixed;
     top:10px;
     left:15px;
-}
-
-/* CATEGORY BUTTONS */
-#categories{
-    margin-top:10px;
-}
-
-.cat{
-    padding:5px 10px;
-    margin:5px;
+    padding:10px;
     border:none;
-    border-radius:8px;
+    border-radius:10px;
     cursor:pointer;
+    transition:0.3s;
+}
+#musicBtn:hover{
+    transform:scale(1.3);
 }
 
 /* LOOTBOX */
 #lootbox{
-    position:fixed;
-    bottom:20px;
-    left:20px;
-    padding:10px 15px;
-    background:#111;
-    border-radius:10px;
+    position:absolute;
+    top:50%;
+    left:50%;
+    transform:translate(-50%,-50%);
+    font-size:120px;
     cursor:pointer;
+    transition:0.2s;
+}
+#lootbox:hover{
+    transform:translate(-50%,-50%) scale(1.1);
 }
 
-/* COMBO */
-#combo{
+/* BREAK ANIMATION */
+.break{
+    animation:break 0.6s forwards;
+}
+@keyframes break{
+    0%{transform:translate(-50%,-50%) scale(1);}
+    50%{transform:translate(-50%,-50%) rotate(20deg) scale(1.3);}
+    100%{transform:translate(-50%,-50%) rotate(-60deg) scale(0);}
+}
+
+/* CHALLENGE POPUP */
+#challenge{
     position:fixed;
-    bottom:20px;
-    right:20px;
-    font-size:18px;
+    bottom:60px;
+    left:50%;
+    transform:translateX(-50%);
+    font-size:25px;
+    opacity:0;
+    transition:0.5s;
 }
-
-/* RARITY */
-.common{color:white;}
-.rare{color:#4cc9f0;}
-.epic{color:#b517ff;}
-.legendary{color:#ffd60a;}
 
 /* SHAKE */
-.shake{animation:shake 0.4s;}
+.shake{
+    animation:shake 0.4s;
+}
 @keyframes shake{
     0%{transform:translate(0);}
     20%{transform:translate(-10px);}
@@ -116,171 +109,115 @@ body{
 <body>
 
 <div id="owner">👑 OWNER : TEJPREET</div>
-<button id="musicBtn" onclick="toggleMusic()">🎵</button>
 
-<div class="container">
+<button id="musicBtn" onclick="toggleMusic()">🔊</button>
 
-<h1>🎲 Random Challenge Generator</h1>
+<div id="lootbox">🎰</div>
 
-<div id="challenge">Click to start</div>
-
-<div id="difficulty"></div>
-
-<div id="categories">
-<button class="cat" onclick="setCat('all')">All</button>
-<button class="cat" onclick="setCat('fun')">Fun</button>
-<button class="cat" onclick="setCat('physical')">Physical</button>
-<button class="cat" onclick="setCat('social')">Social</button>
-</div>
-
-<button onclick="generate()">Generate Challenge</button>
-
-</div>
-
-<!-- LOOTBOX -->
-<div id="lootbox" onclick="openLootbox()">🎰 Open Lootbox</div>
-
-<!-- COMBO -->
-<div id="combo">🔥 Combo: 0</div>
-
-<audio id="vine">
-    <source src="vineboom.mp3">
-</audio>
+<div id="challenge"></div>
 
 <audio id="bgm" loop>
-    <source src="bgm.mp3">
+<source src="bgm.mp3">
+</audio>
+
+<audio id="vine">
+<source src="vineboom.mp3">
+</audio>
+
+<audio id="thrash">
+<source src="Thrash.mp3">
 </audio>
 
 <script>
 
 /* MUSIC */
 const bgm=document.getElementById("bgm");
+let musicOn=true;
+
 function toggleMusic(){
-    bgm.paused ? bgm.play() : bgm.pause();
+if(musicOn){bgm.pause();musicOn=false;}
+else{bgm.play();musicOn=true;}
 }
 
 /* PARTICLES */
-for(let i=0;i<40;i++){
-    let p=document.createElement("div");
-    p.className="particle";
-    p.style.left=Math.random()*100+"vw";
-    p.style.animationDuration=(Math.random()*10+5)+"s";
-    document.body.appendChild(p);
+for(let i=0;i<50;i++){
+let p=document.createElement("div");
+p.className="particle";
+p.style.left=Math.random()*100+"vw";
+p.style.animationDuration=(Math.random()*8+5)+"s";
+document.body.appendChild(p);
 }
 
-/* COMBO SYSTEM */
-let combo=0;
-
-/* CATEGORIES */
-let currentCat="all";
-
-function setCat(c){
-    currentCat=c;
-}
-
-/* CHALLENGES */
+/* 100 CHALLENGES */
 const challenges=[
-{t:"Do 10 pushups",r:"common",c:"physical"},
-{t:"Dance for 20 sec",r:"common",c:"fun"},
-{t:"Act like chicken",r:"common",c:"fun"},
-
-{t:"Do 50 squats",r:"rare",c:"physical"},
-{t:"Talk to a stranger",r:"rare",c:"social"},
-
-{t:"Sing in public",r:"epic",c:"social"},
-
-{t:"Scream I AM LEGEND",r:"legendary",c:"fun"}
+"Do 10 pushups","Do 20 squats","Run in place 1 min","Dance randomly","Act like a chicken",
+"Sing loudly","Spin 10 times","Jump 15 times","Do plank 30s","Do 5 burpees",
+"Walk backwards","Talk in robot voice","Clap 50 times","Stare challenge 1 min","Sit and stand 20x",
+"Touch your toes","Balance on one foot","Do 10 lunges","Make a funny face","Say alphabet backwards",
+"Run around room","Do shadow boxing","Do 15 situps","Hop on one leg","Pretend you're a zombie",
+"Do air guitar","Do 30 jumping jacks","Act like monkey","Whisper for 1 min","Freeze for 30s",
+"Do 5 cartwheels","Dance without music","Act scared","Sing opera style","Do slow motion walk",
+"Make meme face","Do 10 squats slow","Act like robot","Spin chair 5 times","Do wall sit 30s",
+"Run outside","Clap above head","Do 10 pushups slow","Act like alien","Talk without lips",
+"Do crab walk","Jump like frog","Act like superhero","Do 25 squats","Do 1 min plank",
+"Do 10 burpees","Act like boss","Walk like ninja","Do silly dance","Make rap beat",
+"Say tongue twister","Do shadow dance","Balance book head","Do pushups fast","Act like clown",
+"Run zigzag","Do squat jumps","Act like ghost","Do air boxing","Do 50 jumps",
+"Spin 20 times","Act like teacher","Do 10 frog jumps","Do situps fast","Act like king",
+"Do plank walk","Do 30 squats","Act like robot broken","Jump backwards","Do funny scream",
+"Act like DJ","Do fast dance","Do slow squat","Do 10 pushups clap","Act like villain",
+"Do star jumps","Run in circle","Do wall pushups","Act like dragon","Do 100 jumps",
+"Hold breath 10s","Do silent dance","Act like statue","Do ninja roll","Do 20 burpees",
+"Do handstand try","Act like superhero landing","Do power pose","Do silly walk","Freeze dance"
 ];
 
-/* GENERATE */
-function generate(){
+let clickCount=0;
 
-let pool=challenges;
+/* LOOTBOX */
+const box=document.getElementById("lootbox");
+const text=document.getElementById("challenge");
 
-if(currentCat!=="all"){
-    pool=challenges.filter(x=>x.c===currentCat);
-}
+box.addEventListener("click",()=>{
 
-let ch=pool[Math.floor(Math.random()*pool.length)];
+clickCount++;
 
-document.getElementById("challenge").innerText=ch.t;
-document.getElementById("difficulty").innerText=ch.r.toUpperCase();
-document.getElementById("difficulty").className=ch.r;
+/* TRIPLE CLICK EVENT */
+if(clickCount===3){
+clickCount=0;
 
-/* BACKGROUND */
-if(ch.r==="rare")
-document.body.style.background="linear-gradient(135deg,#0033ff,#00c3ff)";
-else if(ch.r==="epic")
-document.body.style.background="linear-gradient(135deg,#6a00ff,#ff00d4)";
-else if(ch.r==="legendary")
-document.body.style.background="linear-gradient(135deg,#ffb700,#ff2a2a)";
-else
-document.body.style.background="linear-gradient(135deg,#6a11cb,#2575fc)";
+document.getElementById("thrash").play();
+box.classList.add("shake","break");
 
-/* EFFECTS */
-if(ch.r!=="common"){
-document.getElementById("vine").play();
-document.body.classList.add("shake");
-setTimeout(()=>document.body.classList.remove("shake"),400);
-}
+setTimeout(()=>{
+box.classList.remove("break");
 
-/* COMBO */
-combo++;
-document.getElementById("combo").innerText="🔥 Combo: "+combo;
-}
+let c=challenges[Math.floor(Math.random()*challenges.length)];
 
-/* LOOTBOX SYSTEM */
-function openLootbox(){
+text.innerText=c;
+text.style.opacity=1;
+text.style.transform="scale(1.2)";
 
-let spin=0;
-let speed=60;
+setTimeout(()=>{
+text.style.transform="scale(1)";
+},500);
 
-let lootbox=document.getElementById("lootbox");
-lootbox.style.transform="scale(1.2)";
-lootbox.style.boxShadow="0 0 20px white";
+},600);
 
-let interval=setInterval(()=>{
+}else{
 
-document.getElementById("challenge").innerText =
-challenges[Math.floor(Math.random()*challenges.length)].t;
-
-/* slow down effect */
-spin++;
-
-if(spin>5) speed=90;
-if(spin>10) speed=140;
-if(spin>15) speed=200;
-
-clearInterval(interval);
-interval=setInterval(arguments.callee, speed);
-
-if(spin>20){
-
-clearInterval(interval);
-
-/* FINAL REVEAL */
-let final = challenges[Math.floor(Math.random()*challenges.length)];
-
-document.getElementById("challenge").innerText = final.t;
-
-/* pop animation */
-lootbox.style.transform="scale(1)";
-lootbox.style.boxShadow="0 0 0px transparent";
-
-document.getElementById("difficulty").innerText=final.r.toUpperCase();
-document.getElementById("difficulty").className=final.r;
-
-if(final.r!=="common"){
-document.getElementById("vine").play();
-document.body.classList.add("shake");
-setTimeout(()=>document.body.classList.remove("shake"),400);
-}
+box.style.transform="translate(-50%,-50%) scale(1.2)";
+setTimeout(()=>{
+box.style.transform="translate(-50%,-50%) scale(1)";
+},200);
 
 }
 
-},60);
+});
 
-}
+/* START MUSIC ON CLICK */
+document.addEventListener("click",()=>{
+bgm.play();
+},{once:true});
 
 </script>
 
