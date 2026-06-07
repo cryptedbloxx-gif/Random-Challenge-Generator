@@ -196,6 +196,15 @@ function generateChallenge(){
 const dice = document.getElementById("dice");
 
 let hoverTimer;
+    const bgm = document.getElementById("bgm");
+
+bgm.volume = 0.2;
+
+document.addEventListener("click", () => {
+    if (bgm.paused) {
+        bgm.play();
+    }
+}, { once: true });
 
 const goofyFaces = [
     "🤪",
